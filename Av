@@ -1,17 +1,20 @@
-function logToTxtFile(logContent, fileName) {
-  const blob = new Blob([logContent], { type: 'text/plain' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = fileName;
+const fs = require('fs');
+const path = require('path');
 
-  document.body.appendChild(link);
-  link.click();
+const logFilePath = path.join(__dirname, 'log.txt');
 
-  document.body.removeChild(link);
-  URL.revokeObjectURL(link.href);
+function redirectConsoleToFile() {
+  const originalConsoleLog = console.log;
+
+  console.log = function (...args) {
+    const logMessage = args.join(' ');
+    fs.appendFileSync(logFilePath, logMessage + '\n');
+    originalConsoleLog.apply(console, args);
+  };
 }
 
+// Redirect console output to the file
+redirectConsoleToFile();
+
 // Example usage
-const logContent = 'Your log content goes here.';
-const fileName = 'log.txt';
-logToTxtFile(logContent, fileName);
+console.log('This log message will be written to log.txt');
