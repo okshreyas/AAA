@@ -33,3 +33,22 @@ app.post("/changepass", (req, res) => {
     }
   });
 });
+
+SELECT 
+  *,
+  CASE 
+    WHEN rnk IS NULL OR rnk <= 1 THEN 'Manager'
+    WHEN rnk = 2 THEN 'TeamLead'
+  END AS Role
+FROM your_table
+ORDER BY 
+  CASE 
+    WHEN rnk IS NULL THEN 0
+    WHEN rnk = 1 THEN 1
+    WHEN rnk = 2 THEN 2
+  END,
+  rnk;
+
+UPDATE your_table
+SET leadmail = 'NA'
+WHERE rnk = 1;
