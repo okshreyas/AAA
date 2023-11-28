@@ -1,20 +1,19 @@
-const fs = require('fs');
-const path = require('path');
+function clearConsoleAfterDuration(durationInMinutes) {
+  const durationInMilliseconds = durationInMinutes * 60 * 1000;
 
-const logFilePath = path.join(__dirname, 'log.txt');
+  // Clear console initially
+  console.clear();
 
-function redirectConsoleToFile() {
-  const originalConsoleLog = console.log;
+  // Set up an interval to clear the console after the specified duration
+  const intervalId = setInterval(function () {
+    console.clear();
+  }, durationInMilliseconds);
 
-  console.log = function (...args) {
-    const logMessage = args.join(' ');
-    fs.appendFileSync(logFilePath, logMessage + '\n');
-    originalConsoleLog.apply(console, args);
-  };
+  // Clear interval after the specified duration
+  setTimeout(function () {
+    clearInterval(intervalId);
+  }, durationInMilliseconds);
 }
 
-// Redirect console output to the file
-redirectConsoleToFile();
-
-// Example usage
-console.log('This log message will be written to log.txt');
+// Example usage: Clear console every 40 minutes
+clearConsoleAfterDuration(40);
