@@ -1,19 +1,34 @@
-function clearConsoleAfterDuration(durationInMinutes) {
-  const durationInMilliseconds = durationInMinutes * 60 * 1000;
+Certainly! You can add a confirmation box to a delete button using the `window.confirm` method in JavaScript. Here's an example:
 
-  // Clear console initially
-  console.clear();
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
 
-  // Set up an interval to clear the console after the specified duration
-  const intervalId = setInterval(function () {
-    console.clear();
-  }, durationInMilliseconds);
+  <button onclick="confirmDelete()">Delete</button>
 
-  // Clear interval after the specified duration
-  setTimeout(function () {
-    clearInterval(intervalId);
-  }, durationInMilliseconds);
-}
+  <script>
+    function confirmDelete() {
+      // Display a confirmation dialog
+      var isConfirmed = window.confirm("Are you sure you want to delete?");
 
-// Example usage: Clear console every 40 minutes
-clearConsoleAfterDuration(40);
+      // Check if the user confirmed
+      if (isConfirmed) {
+        // If confirmed, perform the delete action
+        alert("Deleted!"); // Replace this with your actual delete logic
+      } else {
+        // If not confirmed, do nothing or provide feedback
+        alert("Deletion canceled.");
+      }
+    }
+  </script>
+
+</body>
+</html>
+```
+
+In this example, when the "Delete" button is clicked, a confirmation dialog will appear. If the user clicks "OK," it will show an alert indicating that the deletion was confirmed. If the user clicks "Cancel," it will show an alert indicating that the deletion was canceled. Replace the `alert("Deleted!");` line with your actual delete logic.
