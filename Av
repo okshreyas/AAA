@@ -35,13 +35,20 @@ function copyColumn(colIndex) {
   }
 
   var copiedText = columnElements.join('\n');
-  console.log(copiedText);
 
-  // You can now use 'copiedText' as needed, for example, copy it to the clipboard
-  // Clipboard functionality requires additional code or a library
-  // depending on browser compatibility.
+  // Create a textarea element, set its value, and append it to the document
+  var textarea = document.createElement("textarea");
+  textarea.value = copiedText;
+  document.body.appendChild(textarea);
 
-  // For simplicity, I'm just logging the result to the console.
+  // Select the textarea's content and copy it to the clipboard
+  textarea.select();
+  document.execCommand('copy');
+
+  // Remove the textarea element
+  document.body.removeChild(textarea);
+
+  alert("Column copied to clipboard");
 }
 </script>
 
