@@ -1,56 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Copy Column Elements</title>
-</head>
-<body>
-
-<table id="myTable" border="1">
-  <tr>
-    <td>Row 1, Col 1</td>
-    <td>Row 1, Col 2</td>
-  </tr>
-  <tr>
-    <td>Row 2, Col 1</td>
-    <td>Row 2, Col 2</td>
-  </tr>
-  <!-- Add more rows as needed -->
-</table>
-
-<button onclick="copyColumn(1)">Copy Column</button>
-
-<script>
-function copyColumn(colIndex) {
-  var table = document.getElementById("myTable");
-  var rows = table.getElementsByTagName('tr');
-  var columnElements = [];
-
-  for (var i = 0; i < rows.length; i++) {
-    var cells = rows[i].getElementsByTagName('td');
-    if (cells.length > colIndex) {
-      columnElements.push(cells[colIndex].innerText);
-    }
-  }
-
-  var copiedText = columnElements.join('\n');
-
-  // Create a textarea element, set its value, and append it to the document
-  var textarea = document.createElement("textarea");
-  textarea.value = copiedText;
-  document.body.appendChild(textarea);
-
-  // Select the textarea's content and copy it to the clipboard
-  textarea.select();
-  document.execCommand('copy');
-
-  // Remove the textarea element
-  document.body.removeChild(textarea);
-
-  alert("Column copied to clipboard");
-}
-</script>
-
-</body>
-</html>
+Sub SplitFullName()
+    Dim ws As Worksheet
+    Set ws = ActiveSheet ' Change to the specific worksheet if needed
+    
+    Dim lastRow As Long
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    
+    Dim i As Long
+    For i = 1 To lastRow
+        Dim fullName As String
+        fullName = ws.Cells(i, 1).Value
+        
+        Dim nameParts() As String
+        nameParts = Split(fullName)
+        
+        Dim firstName As String
+        Dim lastName As String
+        
+        If UBound(nameParts) > 0 Then
+            firstName = Join(Application.Index(nameParts, 0, 0), " ")
+            lastName = nameParts(UBound(nameParts))
+            
+            ' Assuming you want to place the results in columns B and C
+            ws.Cells(i, 2).Value = firstName
+            ws.Cells(i, 3).Value = lastName
+        Else
+            ' Handle case with only one word (no last name)
+            ws.Cells(i, 2).Value = fullName
+        End If
+    Next i
+End Sub
