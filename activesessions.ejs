@@ -1,40 +1,31 @@
-<!-- views/activesessions.ejs -->
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Active Sessions</title>
-  <style>
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;
-    }
-  </style>
-</head>
-<body>
-  <h2>Active Sessions</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>User ID</th>
-        <th>Login Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% sessions.forEach(session => { %>
-        <tr>
-          <td><%= session.userId %></td>
-          <td><%= session.loginTime %></td>
-        </tr>
-      <% }); %>
-    </tbody>
-  </table>
-</body>
-</html>
+INSERT INTO users (column1, column2, column3)
+SELECT
+    CASE WHEN RAND() < 0.1667 THEN 'Javascript'
+         WHEN RAND() < 0.3333 THEN 'java'
+         WHEN RAND() < 0.5 THEN 'python'
+         WHEN RAND() < 0.6667 THEN 'cloud'
+         WHEN RAND() < 0.8333 THEN 'html'
+         ELSE 'css'
+    END AS column1,
+    CASE WHEN RAND() < 0.1667 THEN 'Javascript'
+         WHEN RAND() < 0.3333 THEN 'java'
+         WHEN RAND() < 0.5 THEN 'python'
+         WHEN RAND() < 0.6667 THEN 'cloud'
+         WHEN RAND() < 0.8333 THEN 'html'
+         ELSE 'css'
+    END AS column2,
+    CASE WHEN RAND() < 0.1667 THEN 'Javascript'
+         WHEN RAND() < 0.3333 THEN 'java'
+         WHEN RAND() < 0.5 THEN 'python'
+         WHEN RAND() < 0.6667 THEN 'cloud'
+         WHEN RAND() < 0.8333 THEN 'html'
+         ELSE 'css'
+    END AS column3
+FROM
+    (SELECT t1.id, t2.*
+     FROM (SELECT @rownum := @rownum + 1 AS id
+           FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t,
+                (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t2,
+                (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t3,
+                (SELECT @rownum := -1) r) t1
+     CROSS JOIN emp t2) t;
