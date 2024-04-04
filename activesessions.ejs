@@ -1,31 +1,17 @@
+-- Define the list of skills
+SET @skills := 'Javascript,java,python,cloud,html,css';
+
+-- Insert random skills into the "users" table
 INSERT INTO users (pskill, currskill, desskill)
 SELECT
-    CASE WHEN RAND() < 0.1667 THEN 'Javascript'
-         WHEN RAND() < 0.3333 THEN 'java'
-         WHEN RAND() < 0.5 THEN 'python'
-         WHEN RAND() < 0.6667 THEN 'cloud'
-         WHEN RAND() < 0.8333 THEN 'html'
-         ELSE 'css'
-    END AS pskill,
-    CASE WHEN RAND() < 0.1667 THEN 'Javascript'
-         WHEN RAND() < 0.3333 THEN 'java'
-         WHEN RAND() < 0.5 THEN 'python'
-         WHEN RAND() < 0.6667 THEN 'cloud'
-         WHEN RAND() < 0.8333 THEN 'html'
-         ELSE 'css'
-    END AS currskill,
-    CASE WHEN RAND() < 0.1667 THEN 'Javascript'
-         WHEN RAND() < 0.3333 THEN 'java'
-         WHEN RAND() < 0.5 THEN 'python'
-         WHEN RAND() < 0.6667 THEN 'cloud'
-         WHEN RAND() < 0.8333 THEN 'html'
-         ELSE 'css'
-    END AS desskill
+    SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1) AS pskill,
+    SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1) AS currskill,
+    SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1) AS desskill
 FROM
-    (SELECT DISTINCT t1.id, t2.*
-     FROM (SELECT @rownum := @rownum + 1 AS id
-           FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t,
-                (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t2,
-                (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t3,
-                (SELECT @rownum := -1) r) t1
-     CROSS JOIN emp t2) t;
+    (SELECT n FROM (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6) AS nums) AS random_nums
+CROSS JOIN
+    (SELECT @rownum := @rownum + 1 AS id
+     FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t,
+          (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t2,
+          (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) t3,
+          (SELECT @rownum := -1) r) AS id_generator;
