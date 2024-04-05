@@ -8,3 +8,12 @@ SET
     currskill = SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1),
     desskill = SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1)
 WHERE id >= 3;
+
+
+-- Update existing rows in the "users" table with random dates
+UPDATE users
+SET
+    pskilldate = DATE_ADD('2024-01-01', INTERVAL FLOOR(RAND() * DATEDIFF('2024-03-30', '2024-01-01')) DAY),
+    currskilldate = DATE_ADD('2024-01-01', INTERVAL FLOOR(RAND() * DATEDIFF('2024-03-30', '2024-01-01')) DAY),
+    desskilldate = DATE_ADD('2024-01-01', INTERVAL FLOOR(RAND() * DATEDIFF('2024-03-30', '2024-01-01')) DAY)
+WHERE id >= 3;
