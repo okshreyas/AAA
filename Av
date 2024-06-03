@@ -1,191 +1,59 @@
-**Software Requirements Specification (SRS) for Skill Vault**
+const express = require('express');
+const mysql = require('mysql2');
+const app = express();
+const PORT = 3000;
 
-**1. Introduction**
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'your_database_name'
+});
 
-**Purpose:** 
-The Skill Vault project aims to develop a comprehensive platform for managing and optimizing employee skillsets within organizations. By providing tools for skill assessment, gap analysis, learning resource recommendation, and performance monitoring, Skill Vault empowers employees to develop their skills and enables managers to make informed talent management decisions.
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL: ', err);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
 
-**Scope:**
-The Skill Vault system encompasses three primary user roles: employees, managers, and administrators. Each role has specific functionalities tailored to their needs, including profile management, skill assessment, talent development planning, and reporting. The system will be accessible via web browsers and mobile devices, with integration capabilities with existing organizational systems.
+app.use(express.static('public'));
 
-**Definitions, Acronyms, and Abbreviations:**
-- Skill Vault: The software system for managing employee skillsets.
-- SRS: Software Requirements Specification.
-- API: Application Programming Interface.
-- HR: Human Resources.
+app.get('/api/products', (req, res) => {
+  const resultsPerPage = 10;
+  const page = req.query.page ? parseInt(req.query.page) : 1;
+  const startFrom = (page - 1) * resultsPerPage;
 
-**References:**
-No external references are needed for this SRS.
+  connection.query(
+    'SELECT * FROM products LIMIT ?, ?',
+    [startFrom, resultsPerPage],
+    (err, results) => {
+      if (err) {
+        console.error('Error fetching products: ', err);
+        res.status(500).send('Server error');
+        return;
+      }
 
-**Overview of the Document:**
-This document outlines the requirements and specifications for the Skill Vault system, detailing its functionalities, user interactions, and technical specifications.
-sew
-**2. Overall Description**
+      connection.query('SELECT COUNT(*) AS count FROM products', (err, countResult) => {
+        if (err) {
+          console.error('Error counting products: ', err);
+          res.status(500).send('Server error');
+          return;
+        }
 
-**Product Perspective:**
-Skill Vault serves as a standalone system within the organizational management ecosystem, providing complementary functionalities to existing HR and talent management systems. It integrates seamlessly with external systems via APIs to ensure data consistency and facilitate cross-functional collaboration.
+        const totalProducts = countResult[0].count;
+        res.json({
+          products: results,
+          totalProducts,
+          totalPages: Math.ceil(totalProducts / resultsPerPage),
+          currentPage: page
+        });
+      });
+    }
+  );
+});
 
-**Product Functions:**
-Skill Vault offers a wide range of functionalities for managing employee skillsets, including:
-- User authentication and profile management
-- Skill assessment and gap analysis
-- Learning resource recommendation
-- Talent development planning
-- Reporting and analytics
-- Integration with organizational systems
-
-**User Classes and Characteristics:**
-- Employees: Users who create and manage their skill profiles, undergo skill assessments, and access learning resources.
-- Managers: Users responsible for talent management, including skill gap analysis, talent development planning, and performance monitoring.
-- Administrators: Users with administrative privileges who oversee system configuration, user management, and data moderation.
-
-**Operating Environment:**
-Skill Vault will be deployed on cloud-based infrastructure to ensure scalability, reliability, and accessibility. The system will support modern web browsers (e.g., Chrome, Firefox, Safari) and mobile platforms (iOS, Android) for user access.
-
-**Design and Implementation Constraints:**
-Skill Vault must adhere to data protection and privacy regulations (e.g., GDPR, CCPA) to ensure the confidentiality and security of user information. The system architecture should be modular and scalable to accommodate future enhancements and updates.
-
-**User Documentation:**
-User documentation will include user manuals, tutorials, and help guides accessible within the Skill Vault platform. Documentation will be regularly updated to reflect system changes and new features.
-
-**Assumptions and Dependencies:**
-- Assumption: Users have access to internet-enabled devices (e.g., computers, smartphones) to access Skill Vault.
-- Dependency: Skill Vault relies on external APIs for integration with organizational systems such as HR databases and learning management systems.
-
-**3. Specific Requirements**
-
-**External Interface Requirements:**
-- User Interfaces: The user interface should be intuitive and user-friendly, with role-based access controls and customizable dashboards.
-- Hardware Interfaces: Skill Vault should be compatible with standard hardware configurations, including desktop computers, laptops, tablets, and smartphones.
-- Software Interfaces: Integration with external systems will be achieved through well-defined APIs, ensuring data exchange and interoperability.
-- Communications Interfaces: Skill Vault should support secure communication protocols (e.g., HTTPS) to protect data during transmission.
-
-**Functional Requirements:**
-1. **User Authentication:**
-   - Employees, managers, and administrators must authenticate using unique credentials (username/password, biometric authentication).
-   - Forgot password functionality should allow users to reset their passwords securely.
-
-2. **Profile Management:**
-   - Employees can create, update, and delete their user profiles.
-   - Managers and administrators have the authority to manage user profiles and permissions.
-
-3. **Skillset Management:**
-   - Employees can add, edit, and remove skills from their profiles.
-   - Primary, secondary, and desired skills can be specified by employees.
-   - Managers can verify and endorse employee skills for validation.
-
-4. **Skill Assessment:**
-   - Employees can undergo skill assessments through quizzes, tests, or self-assessment questionnaires.
-   - Skill assessment results are stored and used for skill analysis and development planning.
-
-5. **Skill Gap Analysis:**
-   - The system conducts automatic skill gap analyses based on organizational needs and employee skill profiles.
-   - Skill gap analysis reports identify areas where additional training or recruitment may be required.
-
-6. **Learning Resources Recommendation:**
-   - Skill Vault recommends learning resources (e.g., courses, training programs, tutorials) based on employee skill profiles and organizational requirements.
-   - Recommended resources are personalized to address individual skill gaps and learning objectives.
-
-7. **Talent Development Planning:**
-   - Managers can develop personalized skill development plans for employees, aligning learning objectives with organizational goals and career progression paths.
-   - Development plans may include recommended courses, projects, mentorship opportunities, etc.
-
-8. **Reporting and Analytics:**
-   - Skill Vault provides comprehensive reporting and analytics tools for monitoring skill development, performance trends, and organizational needs.
-   - Administrators and managers can generate various reports and visualizations to support decision-making processes.
-
-9. **Integration with Organizational Systems:**
-   - Skill Vault integrates seamlessly with existing organizational systems, such as HR databases and learning management systems.
-   - Data exchange and synchronization between Skill Vault and external systems are achieved through APIs.
-
-**Non-functional Requirements:**
-- Performance: Skill Vault should be responsive and capable of handling concurrent user interactions with minimal latency.
-- Security: User authentication mechanisms should be robust, and data encryption should be employed to protect sensitive information.
-- Reliability: Skill Vault should be highly available, with minimal downtime for maintenance or upgrades.
-- Maintainability: The system architecture should be modular and well-documented to facilitate future updates and enhancements.
-- Scalability: Skill Vault should be scalable to accommodate growth in the number of users and skill profiles over time.
-- Compatibility: The system should be compatible with a wide range of web browsers and mobile platforms to ensure accessibility for all users.
-- Usability: The user interface should be intuitive and easy to navigate, requiring minimal training for new users.
-
-**4. System Features**
-
-**Employee Side:**
-1. User Authentication
-2. Profile Management
-3. Skillset Management
-4. Skill Assessment
-5. Learning Resources Recommendation
-
-**Management Side:**
-1. Skill Gap Analysis
-2. Talent Development Planning
-3. Reporting and Analytics
-
-**Admin Side:**
-1. User Management
-2. System Configuration
-3. Data Moderation
-
-**5. External Interface Requirements**
-
-**Technical Requirements:**
-- Programming Languages: The backend of Skill Vault will be developed using Python, with Django as the web framework. Frontend development will utilize HTML5, CSS3, and JavaScript.
-- Database: Skill Vault will use PostgreSQL as the relational database management system for data storage.
-- API Integration: External systems integration will be facilitated through RESTful APIs.
-- Security Measures: Skill Vault will implement industry-standard security measures, including encryption, secure authentication mechanisms, and regular security audits.
-- Scalability: The system architecture will be designed to scale horizontally, allowing for increased user load and data volume.
-- Hosting: Skill Vault will be hosted on cloud infrastructure providers such as AWS or Google Cloud Platform to ensure scalability, reliability, and security.
-- Backup and Recovery: Regular backups of system data
-
-
-and configurations will be performed to prevent data loss in case of system failures or corruption.
-
-**6. Other Non-functional Requirements**
-
-**Performance Requirements:**
-- Skill Vault should be capable of handling a large number of concurrent users without experiencing significant performance degradation.
-- Response times for user interactions, such as loading profiles and generating reports, should be within acceptable limits (e.g., under 2 seconds).
-
-**Security Requirements:**
-- All user authentication processes must adhere to industry-standard security protocols to prevent unauthorized access.
-- Data encryption must be implemented to protect sensitive information stored within the system, such as user credentials and skill assessment results.
-- Access controls should be enforced to ensure that users can only view and modify data relevant to their roles and permissions.
-
-**Reliability Requirements:**
-- Skill Vault should be highly available, with a minimum uptime of 99.9% to ensure continuous access for users.
-- Redundancy measures should be in place to mitigate the risk of system failures, such as backup servers and failover mechanisms.
-
-**Maintainability Requirements:**
-- The system should be designed with modularity and extensibility in mind to facilitate future updates and enhancements.
-- Codebase documentation should be comprehensive and regularly updated to assist developers in maintaining and extending the system.
-
-**Scalability Requirements:**
-- Skill Vault should be capable of scaling horizontally to accommodate increases in user traffic and data volume over time.
-- Load balancing techniques should be employed to distribute workload evenly across multiple servers and prevent performance bottlenecks.
-
-**Compatibility Requirements:**
-- Skill Vault should be compatible with a wide range of devices and operating systems to ensure accessibility for all users.
-- Compatibility testing should be conducted regularly to verify that the system functions correctly across different platforms and configurations.
-
-**Usability Requirements:**
-- The user interface should be intuitive and easy to navigate, with clear labeling and minimal clutter.
-- Help documentation and tooltips should be provided to assist users in understanding system features and functionalities.
-
-**Legal and Regulatory Requirements:**
-- Skill Vault must comply with relevant data protection and privacy regulations, such as GDPR, CCPA, and HIPAA, depending on the jurisdiction and industry.
-- Data retention policies should be defined and enforced to ensure compliance with legal requirements regarding the storage and handling of sensitive information.
-
-**7. Appendices**
-
-**Glossary:**
-- A glossary of key terms and acronyms used throughout the SRS document will be provided for reference.
-
-**Index:**
-- An index will be included to facilitate easy navigation and reference within the SRS document.
-
-**Change History:**
-- A change history section will document any revisions made to the SRS document, including revision dates and descriptions of modifications.
-
-**Conclusion**
-
-The Software Requirements Specification for Skill Vault provides a comprehensive overview of the system's functionalities, user interactions, and technical specifications. By adhering to these requirements, the development team can ensure that Skill Vault meets the needs and expectations of its users while maintaining high standards of performance, security, and reliability.
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
