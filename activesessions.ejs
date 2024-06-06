@@ -1,19 +1,20 @@
--- Define the list of skills
-SET @skills := 'Javascript,java,python,cloud,html,css';
+const crypto = require('crypto');
 
--- Update existing rows in the "users" table with random skills
-UPDATE users
-SET
-    pskill = SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1),
-    currskill = SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1),
-    desskill = SUBSTRING_INDEX(SUBSTRING_INDEX(@skills, ',', RAND() * (LENGTH(@skills) - LENGTH(REPLACE(@skills, ',', '')) + 1)), ',', -1)
-WHERE id >= 3;
+function decrypt(encryptedText, secretKey) {
+    const parts = encryptedText.split(':');
+    const iv = Buffer.from(parts[0], 'hex');
+    const encrypted = parts[1];
 
+    const decipher = crypto.createDecipheriv('aes-256-cbc', crypto.scryptSync(secretKey, 'salt', 32), iv);
 
--- Update existing rows in the "users" table with random dates
-UPDATE users
-SET
-    pskilldate = DATE_ADD('2024-01-01', INTERVAL FLOOR(RAND() * DATEDIFF('2024-03-30', '2024-01-01')) DAY),
-    currskilldate = DATE_ADD('2024-01-01', INTERVAL FLOOR(RAND() * DATEDIFF('2024-03-30', '2024-01-01')) DAY),
-    desskilldate = DATE_ADD('2024-01-01', INTERVAL FLOOR(RAND() * DATEDIFF('2024-03-30', '2024-01-01')) DAY)
-WHERE id >= 3;
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
+}
+
+// Example usage:
+const secretKey = 'mySecretKey1234567890';
+const encryptedText = 'your encrypted text here';
+const decryptedText = decrypt(encryptedText, secretKey);
+console.log('Decrypted text:', decryptedText);
